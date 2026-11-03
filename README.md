@@ -1,0 +1,1 @@
+# sysmon-masquerading-detection
