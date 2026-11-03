@@ -15,11 +15,19 @@ Renaming a file changes its name on disk, but not the name compiled into the fil
 
 When a known binary runs under a different name, the two disagree.
 
-## Lab
+## Lab and tools
 
-- Windows 11 VM with Sysmon 15.21 and a custom configuration
-- Atomic Red Team for repeatable attack simulation
-- Event Viewer and PowerShell (`Get-WinEvent`) for analysis
+| Tool | What it does | How I used it |
+|---|---|---|
+| **Sysmon** (Microsoft Sysinternals) | Windows service that logs detailed activity (process starts, file and registry changes) to the event log; an XML config controls what it records | Logged the attack. Event 1 = process created, 4 = service started, 16 = config loaded |
+| **Atomic Red Team** | Open-source library of small, safe attack tests mapped to MITRE ATT&CK; run with the `Invoke-AtomicTest` PowerShell command | Ran test T1036.003-1, then its built-in cleanup |
+| **Event Viewer** | Windows' built-in log browser | Inspected the Event 1 record of the fake `lsass.exe` |
+| **`Get-WinEvent`** | PowerShell command that queries event logs; the scriptable version of Event Viewer | Confirmed Sysmon was logging |
+| **Defender exclusion** (`Add-MpPreference`) | Tells Microsoft Defender to skip scanning a folder | Let the test run, then removed it and verified |
+| **MITRE ATT&CK** | Public catalogue of attacker techniques, each with an ID | Framed the work around T1036.003 |
+
+Environment: Windows 11 VM in VMware, Sysmon 15.21.
+
 
 ## What I did
 
@@ -59,15 +67,3 @@ Scoping the first condition to a watchlist of commonly abused binaries keeps ale
 
 All testing ran in an isolated lab VM with harmless commands only. Every test artifact was removed and the Defender setting restored afterward.
 
-## Lab and tools
-
-| Tool | What it does | How I used it |
-|---|---|---|
-| **Sysmon** (Microsoft Sysinternals) | Windows service that logs detailed activity (process starts, file and registry changes) to the event log; an XML config controls what it records | Logged the attack. Event 1 = process created, 4 = service started, 16 = config loaded |
-| **Atomic Red Team** | Open-source library of small, safe attack tests mapped to MITRE ATT&CK; run with the `Invoke-AtomicTest` PowerShell command | Ran test T1036.003-1, then its built-in cleanup |
-| **Event Viewer** | Windows' built-in log browser | Inspected the Event 1 record of the fake `lsass.exe` |
-| **`Get-WinEvent`** | PowerShell command that queries event logs; the scriptable version of Event Viewer | Confirmed Sysmon was logging |
-| **Defender exclusion** (`Add-MpPreference`) | Tells Microsoft Defender to skip scanning a folder | Let the test run, then removed it and verified |
-| **MITRE ATT&CK** | Public catalogue of attacker techniques, each with an ID | Framed the work around T1036.003 |
-
-Environment: Windows 11 VM in VMware, Sysmon 15.21.
